@@ -1,3 +1,6 @@
+A modification of HIKassem's twoDOscillatingDisplacement Openfoam BC.
+A phase difference between the pitch and heave oscillation is introduced. Additionally, variables are renamed to be more descriptive.
+
 OpenFOAM® and OpenCFD® are registered trademarks of OpenCFD Limited, the producer OpenFOAM software. All registered trademarks are property of their respective owners.
 This offering is not approved or endorsed by OpenCFD Limited, the producer of the OpenFOAM software and owner of the OPENFOAM® and OpenCFD® trade marks.
 http://openfoam.org/
