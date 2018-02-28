@@ -50,20 +50,15 @@ class twoDOscillatingDisplacementPointPatchVectorField
 :
     public fixedValuePointPatchField<vector>
 {
-    // Private data
-
+private:
         vector axis_;
         vector origin_;
-        scalar angle0_;
-        scalar amplitude_;
+        scalar mean_pitch_angle_;
+        scalar pitch_amplitude_;
         scalar omega_;
-
         pointField p0_;
-
-    // added for h
-
-        vector amplitudeH_;
-        scalar omegaH_;
+        vector heave_amplitude_;
+        scalar pitch_phase_offset_;
 
 public:
 

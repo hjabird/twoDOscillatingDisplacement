@@ -46,13 +46,12 @@ twoDOscillatingDisplacementPointPatchVectorField
     fixedValuePointPatchField<vector>(p, iF),
     axis_(vector::zero),
     origin_(vector::zero),
-    angle0_(0.0),
-    amplitude_(0.0),
+    mean_pitch_angle_(0.0),
+    pitch_amplitude_(0.0),
     omega_(0.0),
     p0_(p.localPoints()),
-   //added for H
-    amplitudeH_(vector::zero),
-    omegaH_(0.0)     
+    heave_amplitude_(vector::zero),
+    pitch_phase_offset_(0.0)     
 {}
 
 
@@ -67,12 +66,11 @@ twoDOscillatingDisplacementPointPatchVectorField
     fixedValuePointPatchField<vector>(p, iF, dict),
     axis_(dict.lookup("axis")),
     origin_(dict.lookup("origin")),
-    angle0_(readScalar(dict.lookup("angle0"))),
-    amplitude_(readScalar(dict.lookup("amplitude"))),
+    mean_pitch_angle_(readScalar(dict.lookup("mean_pitch_angle"))),
+    pitch_amplitude_(readScalar(dict.lookup("pitch_amplitude"))),
     omega_(readScalar(dict.lookup("omega"))),
-//added for H
-    amplitudeH_(dict.lookup("amplitudeH")),
-    omegaH_(readScalar(dict.lookup("omegaH")))
+    heave_amplitude_(dict.lookup("heave_amplitude")),
+    pitch_phase_offset_(readScalar(dict.lookup("pitch_phase_offset_")))
 {
     if (!dict.found("value"))
     {
@@ -102,13 +100,12 @@ twoDOscillatingDisplacementPointPatchVectorField
     fixedValuePointPatchField<vector>(ptf, p, iF, mapper),
     axis_(ptf.axis_),
     origin_(ptf.origin_),
-    angle0_(ptf.angle0_),
-    amplitude_(ptf.amplitude_),
+    mean_pitch_angle_(ptf.mean_pitch_angle_),
+    pitch_amplitude_(ptf.pitch_amplitude_),
     omega_(ptf.omega_),
     p0_(ptf.p0_, mapper),
-    //added for H
-    amplitudeH_(ptf.amplitudeH_),
-    omegaH_(ptf.omegaH_)
+    heave_amplitude_(ptf.heave_amplitude_),
+    pitch_phase_offset_(ptf.pitch_phase_offset_)
 
 {}
 
@@ -123,13 +120,12 @@ twoDOscillatingDisplacementPointPatchVectorField
     fixedValuePointPatchField<vector>(ptf, iF),
     axis_(ptf.axis_),
     origin_(ptf.origin_),
-    angle0_(ptf.angle0_),
-    amplitude_(ptf.amplitude_),
+    mean_pitch_angle_(ptf.mean_pitch_angle_),
+    pitch_amplitude_(ptf.pitch_amplitude_),
     omega_(ptf.omega_),
     p0_(ptf.p0_),
-//added for H
-    amplitudeH_(ptf.amplitudeH_),
-    omegaH_(ptf.omegaH_)
+    heave_amplitude_(ptf.heave_amplitude_),
+    pitch_phase_offset_(ptf.pitch_phase_offset_)
 
 {}
 
@@ -172,18 +168,17 @@ void twoDOscillatingDisplacementPointPatchVectorField::updateCoeffs()
     const polyMesh& mesh = this->dimensionedInternalField().mesh()();
     const Time& t = mesh.time();
 
-    scalar angle = angle0_ + amplitude_*sin(omega_*t.value());
+    scalar angle = mean_pitch_angle_ 
+		+ pitch_amplitude_ * sin(omega_ * t.value() + pitch_phase_offset_);
     vector axisHat = axis_/mag(axis_);
     vectorField p0Rel(p0_ - origin_);
 
-
-
     vectorField::operator=
     (
-        p0Rel*(cos(angle) - 1)
-      + (axisHat ^ p0Rel*sin(angle))
-      + (amplitudeH_*sin(omegaH_*t.value()))
-      + (axisHat & p0Rel)*(1 - cos(angle))*axisHat
+        p0Rel * (cos(angle) - 1)
+      + (axisHat ^ p0Rel * sin(angle))
+      + (heave_amplitude_ * sin(omega_ * t.value()))
+      + (axisHat & p0Rel) * (1 - cos(angle))*axisHat
     );
 
     fixedValuePointPatchField<vector>::updateCoeffs();
@@ -200,16 +195,16 @@ void twoDOscillatingDisplacementPointPatchVectorField::write
         << axis_ << token::END_STATEMENT << nl;
     os.writeKeyword("origin")
         << origin_ << token::END_STATEMENT << nl;
-    os.writeKeyword("angle0")
-        << angle0_ << token::END_STATEMENT << nl;
-    os.writeKeyword("amplitude")
-        << amplitude_ << token::END_STATEMENT << nl;
+    os.writeKeyword("mean_pitch_angle")
+        << mean_pitch_angle_ << token::END_STATEMENT << nl;
+    os.writeKeyword("pitch_amplitude")
+        << pitch_amplitude_ << token::END_STATEMENT << nl;
     os.writeKeyword("omega")
         << omega_ << token::END_STATEMENT << nl;
-    os.writeKeyword("amplitudeH")
-        << amplitudeH_ << token::END_STATEMENT << nl;
-    os.writeKeyword("omegaH")
-        << omegaH_ << token::END_STATEMENT << nl;
+    os.writeKeyword("heave_amplitude")
+        << heave_amplitude_ << token::END_STATEMENT << nl;
+    os.writeKeyword("pitch_phase_offset")
+        << pitch_phase_offset_ << token::END_STATEMENT << nl;
     p0_.writeEntry("p0", os);
     writeEntry("value", os);
 }
